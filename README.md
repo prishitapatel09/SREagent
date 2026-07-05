@@ -9,12 +9,12 @@ is fixed.
 
 **What it does**
 
-1. ⚡ Reacts instantly to Alertmanager webhooks (firing *and* resolved)
-2. 🔍 Identifies the likely bad commit from the service's real git history
-3. 📖 Finds the right runbook (explainable BM25 matching, not a black box)
-4. 📊 Estimates user impact deterministically from Prometheus (the LLM never does math)
-5. 💬 Posts a structured Slack incident brief (console fallback without Slack)
-6. 📝 Auto-generates a postmortem — timeline mapped 1:1 to recorded events
+1. Reacts instantly to Alertmanager webhooks (firing *and* resolved)
+2. Identifies the likely bad commit from the service's real git history
+3. Finds the right runbook (explainable BM25 matching, not a black box)
+4. Estimates user impact deterministically from Prometheus (the LLM never does math)
+5. Posts a structured Slack incident brief (console fallback without Slack)
+6. Auto-generates a postmortem — timeline mapped 1:1 to recorded events
 
 The whole thing ships with its own breakable "production": a demo store API,
 live traffic, Prometheus alerting, and a seeded git history with planted bad
