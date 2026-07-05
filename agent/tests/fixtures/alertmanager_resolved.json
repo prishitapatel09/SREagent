@@ -1,0 +1,24 @@
+{
+  "version": "4",
+  "status": "resolved",
+  "receiver": "sre-agent",
+  "groupLabels": {"alertname": "HighErrorRate", "service": "shopapi"},
+  "alerts": [
+    {
+      "status": "resolved",
+      "fingerprint": "d4f6a2b8c1e3f5a7",
+      "labels": {
+        "alertname": "HighErrorRate",
+        "service": "shopapi",
+        "severity": "critical",
+        "endpoint": "/checkout"
+      },
+      "annotations": {
+        "summary": "High 5xx rate on /checkout",
+        "description": "62% of requests to /checkout are failing with 5xx"
+      },
+      "startsAt": "2026-07-04T18:30:12Z",
+      "endsAt": "2026-07-04T18:41:07Z"
+    }
+  ]
+}

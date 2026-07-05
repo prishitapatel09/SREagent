@@ -1,0 +1,39 @@
+# Thresholds and `for` durations are demo-tuned: an alert should fire
+# ~60-90s after a failure is injected (see `make drill`).
+groups:
+  - name: shopapi
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum by (endpoint) (rate(http_requests_total{job="shopapi", status=~"5.."}[1m]))
+            / sum by (endpoint) (rate(http_requests_total{job="shopapi"}[1m])) > 0.05
+        for: 30s
+        labels:
+          severity: critical
+          service: shopapi
+        annotations:
+          summary: "High 5xx rate on {{ $labels.endpoint }}"
+          description: "{{ $value | humanizePercentage }} of requests to {{ $labels.endpoint }} are failing with 5xx"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le, endpoint) (rate(http_request_duration_seconds_bucket{job="shopapi"}[1m]))
+          ) > 0.5
+        for: 45s
+        labels:
+          severity: warning
+          service: shopapi
+        annotations:
+          summary: "p95 latency above 500ms on {{ $labels.endpoint }}"
+          description: "p95 latency on {{ $labels.endpoint }} is {{ $value | humanizeDuration }}"
+
+      - alert: ServiceDown
+        expr: up{job="shopapi"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: shopapi
+        annotations:
+          summary: "shopapi target is down"
+          description: "Prometheus cannot scrape shopapi"

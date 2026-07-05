@@ -1,0 +1,74 @@
+services:
+  shopapi:
+    build: ./demo-repo/shopapi   # seeded repo (make seed) — running code == investigated code
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_PATH: /var/log/shopapi/app.log
+    volumes:
+      - shopapi-logs:/var/log/shopapi
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  loadgen:
+    build: ./services/loadgen
+    environment:
+      TARGET_URL: http://shopapi:8000
+      RPS: ${RPS:-10}
+    depends_on:
+      shopapi:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./ops/prometheus:/etc/prometheus:ro
+    depends_on:
+      - shopapi
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./ops/alertmanager:/etc/alertmanager:ro
+
+  agent:
+    build: ./agent
+    ports:
+      - "8080:8080"
+    environment:
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-ollama}
+      LLM_MODEL: ${LLM_MODEL:-qwen3:8b}
+      LLM_TIMEOUT_S: ${LLM_TIMEOUT_S:-60}
+      MAX_TOOL_CALLS: ${MAX_TOOL_CALLS:-10}
+      AGENT_MODE: ${AGENT_MODE:-live}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      PROMETHEUS_URL: http://prometheus:9090
+      REPO_PATH: /repos/shopapi
+      RUNBOOKS_DIR: /runbooks
+      SERVICE_LOG_PATH: /var/log/shopapi/app.log
+      DB_PATH: /data/sreagent.db
+      POSTMORTEM_DIR: /postmortems
+    volumes:
+      - shopapi-logs:/var/log/shopapi:ro
+      - ./demo-repo/shopapi:/repos/shopapi:ro
+      - ./runbooks:/runbooks:ro
+      - ./data:/data
+      - ./postmortems:/postmortems
+    extra_hosts:
+      # Maps host.docker.internal on Linux (native on Docker Desktop for
+      # mac/win). Linux users: Ollama must also listen on a non-loopback
+      # interface — run it with OLLAMA_HOST=0.0.0.0 (see README).
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - prometheus
+
+volumes:
+  shopapi-logs:

@@ -1,0 +1,12 @@
+route:
+  receiver: sre-agent
+  group_by: [alertname, service]
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 4h
+
+receivers:
+  - name: sre-agent
+    webhook_configs:
+      - url: http://agent:8080/webhook/alertmanager
+        send_resolved: true  # the "resolved" webhook triggers the postmortem

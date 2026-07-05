@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SREagent — incident dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <div class="brand">
+      <span class="brand-dot"></span> SREagent
+      <span id="mode-badge" class="mode-badge" title="agent mode"></span>
+    </div>
+    <div class="sidebar-label">Incidents</div>
+    <div id="incident-list"></div>
+    <div id="sidebar-empty" class="sidebar-empty">No incidents yet.<br>Break something: <code>make demo-break</code></div>
+  </aside>
+
+  <main id="main">
+    <div id="empty-state">
+      <div class="empty-title">All quiet.</div>
+      <div class="empty-sub">Waiting for Alertmanager to deliver an alert…</div>
+    </div>
+
+    <div id="incident-view" hidden>
+      <header id="inc-header">
+        <div class="header-row">
+          <h1 id="inc-title"></h1>
+          <span id="inc-status" class="pill"></span>
+        </div>
+        <div class="header-row meta">
+          <span id="inc-severity" class="badge"></span>
+          <span id="inc-service" class="meta-item"></span>
+          <span id="inc-started" class="meta-item"></span>
+          <span id="inc-id" class="meta-item mono"></span>
+        </div>
+        <ol id="phase-strip">
+          <li data-phase="alert">Alert</li>
+          <li data-phase="investigate">Investigate</li>
+          <li data-phase="diagnose">Diagnose</li>
+          <li data-phase="notify">Notify</li>
+          <li data-phase="postmortem">Postmortem</li>
+        </ol>
+      </header>
+
+      <section class="card" id="timeline-card">
+        <h2>Investigation timeline</h2>
+        <div id="timeline"></div>
+      </section>
+
+      <section class="card" id="diagnosis-card" hidden>
+        <h2>Diagnosis <span id="confidence-wrap">confidence
+          <span class="conf-meter"><i></i><i></i><i></i></span>
+          <span id="confidence-label"></span></span>
+        </h2>
+        <p id="diag-summary" class="diag-summary"></p>
+        <div class="diag-grid">
+          <div class="diag-col">
+            <h3>Suspect commit</h3>
+            <div id="diag-commit"></div>
+          </div>
+          <div class="diag-col">
+            <h3>Runbook &amp; remediation</h3>
+            <div id="diag-runbook"></div>
+          </div>
+          <div class="diag-col">
+            <h3>User impact</h3>
+            <div id="diag-impact"></div>
+          </div>
+        </div>
+        <div class="diag-evidence">
+          <h3>Evidence</h3>
+          <ul id="diag-evidence-list"></ul>
+        </div>
+        <p id="diag-root-cause" class="diag-root-cause"></p>
+      </section>
+
+      <section class="card slack" id="slack-card" hidden>
+        <h2>Incident brief <span id="slack-delivery" class="tag"></span></h2>
+        <div class="slack-msg">
+          <div class="slack-avatar">SA</div>
+          <div>
+            <div class="slack-author">SREagent <span class="slack-app">APP</span></div>
+            <pre id="slack-text"></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="postmortem-card" hidden>
+        <h2>Postmortem <a id="postmortem-raw" class="tag" href="#" target="_blank">raw .md</a></h2>
+        <div id="postmortem-body" class="markdown"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/md.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

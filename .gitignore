@@ -1,0 +1,12 @@
+# generated demo repository (rebuild with `make seed`)
+demo-repo/
+
+# runtime state
+data/
+postmortems/*.md
+
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
